@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "79153114867",
+    "project_id": "nexthome1173",
+    "storage_bucket": "nexthome1173.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:79153114867:android:ce51b58a904f0ef7b65186",
+        "android_client_info": {
+          "package_name": "com.example.nexthome"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "453210352651-d049i2akggq2kl2m56rkma6sj9ndiqv6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.nexthome",
+            "certificate_hash": "28232fcf2caacabc3edf4d3dd7a613a411e26a01"
+          }
+        },
+        {
+          "client_id": "453210352651-f4b7l1t9pidf73nv0ko5mkk7ddkonpt3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoSoGGt-s_1ezMLzdK-bLDxyBKfRVKKRQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

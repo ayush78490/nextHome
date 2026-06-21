@@ -1,0 +1,164 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    // ════════════════════════════════════════════════════════════════════════
+    // DOCKER
+    // ════════════════════════════════════════════════════════════════════════
+    {
+      "label": "Docker: Start Dev Services",
+      "type": "shell",
+      "command": "docker compose -f docker/docker-compose.yml up -d",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "presentation": { "reveal": "always", "panel": "dedicated" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Stop Dev Services",
+      "type": "shell",
+      "command": "docker compose -f docker/docker-compose.yml down",
+      "options": { "cwd": "${workspaceFolder}" },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: View Logs",
+      "type": "shell",
+      "command": "docker compose -f docker/docker-compose.yml logs -f",
+      "options": { "cwd": "${workspaceFolder}" },
+      "problemMatcher": []
+    },
+    // ════════════════════════════════════════════════════════════════════════
+    // BACKEND
+    // ════════════════════════════════════════════════════════════════════════
+    {
+      "label": "Backend: Install Dependencies",
+      "type": "shell",
+      "command": "npm install",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: Start Dev Server",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "group": "build",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "." },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": ".",
+          "endsPattern": "running on port"
+        }
+      }
+    },
+    {
+      "label": "Backend: Run Tests",
+      "type": "shell",
+      "command": "npm test",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Backend: Lint & Fix",
+      "type": "shell",
+      "command": "npm run lint:fix",
+      "options": { "cwd": "${workspaceFolder}/backend" },
+      "problemMatcher": ["$eslint-stylish"]
+    },
+    // ════════════════════════════════════════════════════════════════════════
+    // FLUTTER / MOBILE
+    // ════════════════════════════════════════════════════════════════════════
+    {
+      "label": "Flutter: Get Packages",
+      "type": "shell",
+      "command": "flutter pub get",
+      "options": { "cwd": "${workspaceFolder}/mobile" },
+      "group": "build",
+      "problemMatcher": ["$dart-pub"]
+    },
+    {
+      "label": "Flutter: Build Runner (once)",
+      "type": "shell",
+      "command": "dart run build_runner build --delete-conflicting-outputs",
+      "options": { "cwd": "${workspaceFolder}/mobile" },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "Flutter: Build Runner (watch)",
+      "type": "shell",
+      "command": "dart run build_runner watch --delete-conflicting-outputs",
+      "options": { "cwd": "${workspaceFolder}/mobile" },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Flutter: Run Tests",
+      "type": "shell",
+      "command": "flutter test --coverage",
+      "options": { "cwd": "${workspaceFolder}/mobile" },
+      "group": "test",
+      "problemMatcher": ["$dart"]
+    },
+    {
+      "label": "Flutter: Format Code",
+      "type": "shell",
+      "command": "dart format lib/ test/",
+      "options": { "cwd": "${workspaceFolder}/mobile" },
+      "problemMatcher": []
+    },
+    {
+      "label": "Flutter: Analyze",
+      "type": "shell",
+      "command": "flutter analyze",
+      "options": { "cwd": "${workspaceFolder}/mobile" },
+      "group": "test",
+      "problemMatcher": ["$dart"]
+    },
+    {
+      "label": "Flutter: Build APK (Release)",
+      "type": "shell",
+      "command": "flutter build apk --release --dart-define=API_BASE_URL=${input:apiUrl}",
+      "options": { "cwd": "${workspaceFolder}/mobile" },
+      "group": "build",
+      "problemMatcher": []
+    },
+    // ════════════════════════════════════════════════════════════════════════
+    // COMPOSITE
+    // ════════════════════════════════════════════════════════════════════════
+    {
+      "label": "Dev: Start All",
+      "dependsOn": [
+        "Docker: Start Dev Services",
+        "Backend: Start Dev Server",
+        "Flutter: Get Packages"
+      ],
+      "dependsOrder": "sequence",
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "CI: Run All Tests",
+      "dependsOn": [
+        "Backend: Run Tests",
+        "Flutter: Run Tests"
+      ],
+      "dependsOrder": "parallel",
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "apiUrl",
+      "type": "promptString",
+      "description": "API base URL for production build",
+      "default": "https://api.nexthome.app/api/v1"
+    }
+  ]
+}

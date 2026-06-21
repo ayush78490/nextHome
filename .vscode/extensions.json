@@ -1,0 +1,36 @@
+{
+  "recommendations": [
+    // Flutter & Dart
+    "Dart-Code.flutter",
+    "Dart-Code.dart-code",
+    // Node.js & JS
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "christian-kohler.npm-intellisense",
+    "christian-kohler.path-intellisense",
+    // Docker
+    "ms-azuretools.vscode-docker",
+    // REST / HTTP testing
+    "humao.rest-client",
+    "rangav.vscode-thunder-client",
+    // Database
+    "oracle-samples.oracledevtools",
+    // Git
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    // Terraform / IaC
+    "hashicorp.terraform",
+    // YAML
+    "redhat.vscode-yaml",
+    // Environment files
+    "mikestead.dotenv",
+    // Code quality
+    "streetsidesoftware.code-spell-checker",
+    "usernamehw.errorlens",
+    "aaron-bond.better-comments",
+    // Icons
+    "pkief.material-icon-theme",
+    // Markdown
+    "yzhang.markdown-all-in-one"
+  ]
+}

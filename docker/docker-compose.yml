@@ -1,0 +1,123 @@
+version: "3.9"
+
+# ============================================================
+# Next Home – Docker Compose (Development)
+# Usage: docker compose up -d
+# ============================================================
+
+networks:
+  nexthome-net:
+    driver: bridge
+
+volumes:
+  oracle-data:
+    driver: local
+  redis-data:
+    driver: local
+
+services:
+
+  # ── Oracle Database XE 21c ────────────────────────────────────────────────
+  oracle-db:
+    image: gvenzl/oracle-xe:21-slim
+    container_name: nexthome-oracle
+    restart: unless-stopped
+    ports:
+      - "1521:1521"   # TNS listener
+      - "5500:5500"   # Enterprise Manager Express (optional)
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_SYS_PASSWORD:-NextHome_SYS_2024!}
+      APP_USER: ${ORACLE_APP_USER:-nexthome}
+      APP_USER_PASSWORD: ${ORACLE_APP_PASSWORD:-NextHome_App_2024!}
+      ORACLE_CHARACTERSET: AL32UTF8
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - ./oracle/init:/container-entrypoint-initdb.d:ro
+    networks:
+      - nexthome-net
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s  # Oracle XE needs time to initialize
+
+  # ── Redis 7 (Cache + Session + Pub/Sub) ──────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: nexthome-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: >
+      redis-server
+      --requirepass ${REDIS_PASSWORD:-NextHome_Redis_2024!}
+      --maxmemory 256mb
+      --maxmemory-policy allkeys-lru
+      --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - nexthome-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-NextHome_Redis_2024!}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Node.js Backend (dev with hot-reload) ────────────────────────────────
+  backend:
+    build:
+      context: ../backend
+      dockerfile: ../docker/backend/Dockerfile
+      target: development
+    container_name: nexthome-backend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"     # REST API
+      - "3001:3001"     # Socket.IO
+      - "9229:9229"     # Node.js debugger
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      SOCKET_PORT: 3001
+      DATABASE_URL: "oracle://nexthome:${ORACLE_APP_PASSWORD:-NextHome_App_2024!}@oracle-db:1521/XEPDB1"
+      ORACLE_HOST: oracle-db
+      ORACLE_PORT: 1521
+      ORACLE_SID: XEPDB1
+      ORACLE_USER: ${ORACLE_APP_USER:-nexthome}
+      ORACLE_PASSWORD: ${ORACLE_APP_PASSWORD:-NextHome_App_2024!}
+      REDIS_URL: "redis://:${REDIS_PASSWORD:-NextHome_Redis_2024!}@redis:6379"
+      JWT_SECRET: ${JWT_SECRET:-changeme_dev_jwt_secret}
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      RAZORPAY_KEY_ID: ${RAZORPAY_KEY_ID:-}
+      RAZORPAY_KEY_SECRET: ${RAZORPAY_KEY_SECRET:-}
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+    volumes:
+      - ../backend:/app
+      - /app/node_modules  # Anonymous volume to preserve container's node_modules
+    depends_on:
+      oracle-db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - nexthome-net
+    command: npm run dev
+
+  # ── Redis Commander (Dev GUI for Redis) ──────────────────────────────────
+  redis-commander:
+    image: rediscommander/redis-commander:latest
+    container_name: nexthome-redis-gui
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      REDIS_HOSTS: "nexthome-redis:redis:6379:0:${REDIS_PASSWORD:-NextHome_Redis_2024!}"
+    depends_on:
+      - redis
+    networks:
+      - nexthome-net
+    profiles:
+      - tools  # Only starts with: docker compose --profile tools up

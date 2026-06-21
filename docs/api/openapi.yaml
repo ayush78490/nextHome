@@ -1,0 +1,220 @@
+openapi: "3.0.3"
+info:
+  title: Next Home API
+  description: Rental Homes Platform REST API
+  version: "1.0.0"
+  contact:
+    name: Next Home Team
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local development
+  - url: https://api.nexthome.app/api/v1
+    description: Production (OCI)
+
+components:
+  securitySchemes:
+    FirebaseAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Firebase ID Token
+      description: "Firebase ID token obtained from Firebase Auth SDK"
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:         { type: string, format: uuid }
+        email:      { type: string, format: email }
+        phone:      { type: string, nullable: true }
+        fullName:   { type: string }
+        avatarUrl:  { type: string, nullable: true }
+        role:       { type: string, enum: [tenant, landlord, admin] }
+        isVerified: { type: boolean }
+        createdAt:  { type: string, format: date-time }
+
+    Property:
+      type: object
+      properties:
+        id:             { type: string, format: uuid }
+        title:          { type: string }
+        description:    { type: string }
+        propertyType:   { type: string, enum: [apartment, house, villa, studio, commercial] }
+        status:         { type: string, enum: [active, inactive, rented, maintenance] }
+        address:        { type: string }
+        city:           { type: string }
+        state:          { type: string }
+        latitude:       { type: number }
+        longitude:      { type: number }
+        rentPerMonth:   { type: number }
+        securityDeposit: { type: number }
+        bedrooms:       { type: integer }
+        bathrooms:      { type: integer }
+        areaSqft:       { type: number }
+        furnishedStatus: { type: string, enum: [furnished, semi-furnished, unfurnished] }
+        amenities:      { type: array, items: { type: string } }
+        images:         { type: array, items: { type: string, format: uri } }
+        landlordId:     { type: string, format: uuid }
+
+    ApiResponse:
+      type: object
+      properties:
+        success: { type: boolean }
+        data:    {}
+        message: { type: string }
+
+    ErrorResponse:
+      type: object
+      properties:
+        success: { type: boolean, example: false }
+        code:    { type: string }
+        message: { type: string }
+
+paths:
+  /health:
+    get:
+      summary: Health check
+      tags: [System]
+      responses:
+        "200":
+          description: Service healthy
+
+  /auth/login:
+    post:
+      summary: Firebase token exchange (login or register)
+      tags: [Auth]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [idToken]
+              properties:
+                idToken:  { type: string }
+                fcmToken: { type: string }
+      responses:
+        "200":
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/ApiResponse"
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          user:  { $ref: "#/components/schemas/User" }
+                          token: { type: string }
+        "401": { description: Invalid Firebase token }
+
+  /auth/me:
+    get:
+      summary: Get current user profile
+      tags: [Auth]
+      security: [{ FirebaseAuth: [] }]
+      responses:
+        "200":
+          description: Current user
+    patch:
+      summary: Update current user profile
+      tags: [Auth]
+      security: [{ FirebaseAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                fullName:  { type: string }
+                phone:     { type: string }
+                avatarUrl: { type: string }
+      responses:
+        "200": { description: Updated profile }
+
+  /properties:
+    get:
+      summary: List properties with filters
+      tags: [Properties]
+      parameters:
+        - { name: city,          in: query, schema: { type: string } }
+        - { name: propertyType,  in: query, schema: { type: string } }
+        - { name: minRent,       in: query, schema: { type: number } }
+        - { name: maxRent,       in: query, schema: { type: number } }
+        - { name: bedrooms,      in: query, schema: { type: integer } }
+        - { name: lat,           in: query, schema: { type: number } }
+        - { name: lng,           in: query, schema: { type: number } }
+        - { name: radiusKm,      in: query, schema: { type: number } }
+        - { name: page,          in: query, schema: { type: integer, default: 1 } }
+        - { name: limit,         in: query, schema: { type: integer, default: 20 } }
+      responses:
+        "200": { description: Property list }
+    post:
+      summary: Create property (landlord only)
+      tags: [Properties]
+      security: [{ FirebaseAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/Property" }
+      responses:
+        "201": { description: Property created }
+
+  /properties/{id}:
+    get:
+      summary: Get property detail
+      tags: [Properties]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: Property detail }
+
+  /bookings:
+    get:
+      summary: Get my bookings
+      tags: [Bookings]
+      security: [{ FirebaseAuth: [] }]
+      responses:
+        "200": { description: Bookings list }
+    post:
+      summary: Create booking (tenant only)
+      tags: [Bookings]
+      security: [{ FirebaseAuth: [] }]
+      responses:
+        "201": { description: Booking created }
+
+  /payments/order:
+    post:
+      summary: Create payment order (Razorpay or Stripe)
+      tags: [Payments]
+      security: [{ FirebaseAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [bookingId, gateway]
+              properties:
+                bookingId: { type: string }
+                gateway:   { type: string, enum: [razorpay, stripe] }
+      responses:
+        "200": { description: Order created }
+
+  /chat/rooms:
+    get:
+      summary: Get my chat rooms
+      tags: [Chat]
+      security: [{ FirebaseAuth: [] }]
+      responses:
+        "200": { description: Chat rooms list }
+
+  /notifications:
+    get:
+      summary: Get my notifications
+      tags: [Notifications]
+      security: [{ FirebaseAuth: [] }]
+      responses:
+        "200": { description: Notifications list }

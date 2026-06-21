@@ -1,0 +1,101 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    // ── Flutter – Debug on Android Emulator ─────────────────────────────────
+    {
+      "name": "Flutter (Android Debug)",
+      "type": "dart",
+      "request": "launch",
+      "program": "mobile/lib/main.dart",
+      "cwd": "${workspaceFolder}/mobile",
+      "flutterMode": "debug",
+      "args": [
+        "--dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1",
+        "--dart-define=SOCKET_URL=http://10.0.2.2:3001",
+        "--dart-define=GOOGLE_MAPS_API_KEY=${env:GOOGLE_MAPS_API_KEY}",
+        "--dart-define=RAZORPAY_KEY_ID=${env:RAZORPAY_KEY_ID}",
+        "--dart-define=STRIPE_PUBLISHABLE_KEY=${env:STRIPE_PUBLISHABLE_KEY}"
+      ]
+    },
+    // ── Flutter – Profile Mode ──────────────────────────────────────────────
+    {
+      "name": "Flutter (Android Profile)",
+      "type": "dart",
+      "request": "launch",
+      "program": "mobile/lib/main.dart",
+      "cwd": "${workspaceFolder}/mobile",
+      "flutterMode": "profile",
+      "args": [
+        "--dart-define=API_BASE_URL=http://10.0.2.2:3000/api/v1",
+        "--dart-define=SOCKET_URL=http://10.0.2.2:3001"
+      ]
+    },
+    // ── Flutter – iOS Simulator ─────────────────────────────────────────────
+    {
+      "name": "Flutter (iOS Simulator)",
+      "type": "dart",
+      "request": "launch",
+      "program": "mobile/lib/main.dart",
+      "cwd": "${workspaceFolder}/mobile",
+      "flutterMode": "debug",
+      "deviceId": "apple_ios_simulator",
+      "args": [
+        "--dart-define=API_BASE_URL=http://localhost:3000/api/v1",
+        "--dart-define=SOCKET_URL=http://localhost:3001"
+      ]
+    },
+    // ── Node.js – Launch with nodemon (dev) ────────────────────────────────
+    {
+      "name": "Node.js Backend (Launch)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/src/app.js",
+      "cwd": "${workspaceFolder}/backend",
+      "runtimeArgs": ["--inspect=9229"],
+      "envFile": "${workspaceFolder}/backend/.env",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "skipFiles": ["<node_internals>/**"],
+      "resolveSourceMapLocations": ["${workspaceFolder}/backend/**", "!**/node_modules/**"],
+      "restart": true,
+      "console": "integratedTerminal"
+    },
+    // ── Node.js – Attach to running process ────────────────────────────────
+    {
+      "name": "Node.js Backend (Attach)",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/backend",
+      "remoteRoot": "/app",
+      "skipFiles": ["<node_internals>/**"],
+      "restart": true
+    },
+    // ── Node.js – Attach to Docker container ──────────────────────────────
+    {
+      "name": "Node.js Backend (Docker Attach)",
+      "type": "node",
+      "request": "attach",
+      "port": 9229,
+      "address": "localhost",
+      "localRoot": "${workspaceFolder}/backend",
+      "remoteRoot": "/app",
+      "skipFiles": ["<node_internals>/**"],
+      "restart": true,
+      "timeout": 30000
+    }
+  ],
+  "compounds": [
+    // ── Launch everything at once ──────────────────────────────────────────
+    {
+      "name": "Full Stack (Flutter + Node.js)",
+      "configurations": [
+        "Node.js Backend (Launch)",
+        "Flutter (Android Debug)"
+      ],
+      "stopAll": true
+    }
+  ]
+}

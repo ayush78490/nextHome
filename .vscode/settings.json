@@ -1,0 +1,81 @@
+{
+  // ── Editor ─────────────────────────────────────────────────────────────────
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "editor.rulers": [100],
+  "editor.tabSize": 2,
+
+  // ── Files ──────────────────────────────────────────────────────────────────
+  "files.associations": {
+    "*.dart": "dart",
+    "*.yaml": "yaml",
+    "*.yml": "yaml",
+    "*.env*": "dotenv",
+    "Dockerfile*": "dockerfile"
+  },
+  "files.exclude": {
+    "**/.dart_tool": true,
+    "**/build": false,
+    "**/.packages": true
+  },
+
+  // ── Dart / Flutter ─────────────────────────────────────────────────────────
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnSave": true,
+    "editor.selectionHighlight": false,
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off"
+  },
+  "dart.lineLength": 100,
+  "dart.flutterSdkPath": "C:\\flutter",
+  "dart.enableSdkFormatter": true,
+  "dart.debugExternalPackageLibraries": false,
+  "dart.debugSdkLibraries": false,
+
+  // ── JavaScript / Node.js ───────────────────────────────────────────────────
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "eslint.workingDirectories": [{ "directory": "backend", "changeProcessCWD": true }],
+  "eslint.validate": ["javascript"],
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "node.packageManager": "npm",
+
+  // ── Docker ─────────────────────────────────────────────────────────────────
+  "docker.defaultRegistryPath": "container-registry.oracle.com",
+
+  // ── Terraform ─────────────────────────────────────────────────────────────
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform",
+    "editor.formatOnSave": true
+  },
+
+  // ── REST Client ────────────────────────────────────────────────────────────
+  "rest-client.environmentVariables": {
+    "$shared": {
+      "version": "v1"
+    },
+    "local": {
+      "base_url": "http://localhost:3000/api/v1",
+      "socket_url": "http://localhost:3001"
+    },
+    "docker": {
+      "base_url": "http://localhost:3000/api/v1"
+    }
+  },
+
+  // ── Search ─────────────────────────────────────────────────────────────────
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/build": true,
+    "**/.dart_tool": true,
+    "**/android/.gradle": true,
+    "**/ios/Pods": true
+  }
+}
