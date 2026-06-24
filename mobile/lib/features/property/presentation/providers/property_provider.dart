@@ -29,6 +29,9 @@ class PropertyNotifier extends StateNotifier<List<Property>> {
             sqft: json['area']?.toString() ?? '0',
             category: json['property_type']?.toString() ?? 'Other',
             imageUrls: (json['images'] as List?)?.map((e) => e.toString()).toList() ?? [],
+            facilities: (json['facilities'] as List?)?.map((e) => e.toString()).toList() ?? [],
+            locality: json['locality']?.toString() ?? '',
+            description: json['description']?.toString() ?? '',
             isApproved: json['is_approved'] == true,
             landlordId: json['landlord']?['id']?.toString(),
             landlordName: json['landlord']?['full_name']?.toString() ?? json['landlord']?['username']?.toString(),
@@ -37,8 +40,11 @@ class PropertyNotifier extends StateNotifier<List<Property>> {
         }).toList();
         state = properties;
       }
-    } catch (e) {
-      // ignore
+    } catch (e, stackTrace) {
+      // ignore: avoid_print
+      print('Error fetching properties: $e');
+      // ignore: avoid_print
+      print('StackTrace: $stackTrace');
     }
   }
 
@@ -59,6 +65,9 @@ class PropertyNotifier extends StateNotifier<List<Property>> {
       }
 
       await _dio.post('/properties/$propertyId/images', data: formData);
+
+      // Refresh properties after creation
+      await fetchProperties();
     } catch (e) {
       if (propertyId != null) {
         try {
@@ -67,6 +76,30 @@ class PropertyNotifier extends StateNotifier<List<Property>> {
         } catch (_) {}
       }
       throw Exception('Failed to create property: $e');
+    }
+  }
+
+  Future<void> updateProperty(String propertyId, Map<String, dynamic> data, List<String> newImagePaths) async {
+    try {
+      // 1. Update property record
+      await _dio.patch('/properties/$propertyId', data: data);
+
+      // 2. Upload images if there are any new ones
+      if (newImagePaths.isNotEmpty) {
+        final formData = FormData();
+        for (int i = 0; i < newImagePaths.length; i++) {
+          formData.files.add(MapEntry(
+            'images',
+            await MultipartFile.fromFile(newImagePaths[i], filename: 'image_new_$i.jpg'),
+          ));
+        }
+        await _dio.post('/properties/$propertyId/images', data: formData);
+      }
+      
+      // Refresh properties after update
+      await fetchProperties();
+    } catch (e) {
+      throw Exception('Failed to update property: $e');
     }
   }
 

@@ -33,8 +33,12 @@ abstract class AuthRepository {
   Future<Either<Failure, UserEntity>> updateProfile({
     String? fullName,
     String? phone,
+    String? email,
     String? avatarUrl,
   });
+
+  /// Upload avatar picture
+  Future<Either<Failure, UserEntity>> uploadAvatar(String filePath);
 
   /// Sign out (clear local storage + Firebase signOut)
   Future<Either<Failure, void>> signOut();

@@ -32,6 +32,9 @@ class _PropertyCardState extends ConsumerState<PropertyCard> {
         'baths': widget.property.baths,
         'sqft': widget.property.sqft,
         'imageUrls': widget.property.imageUrls,
+        'description': widget.property.description,
+        'facilities': widget.property.facilities,
+        'locality': widget.property.locality,
       },
     );
   }

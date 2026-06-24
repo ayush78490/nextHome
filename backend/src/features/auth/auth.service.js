@@ -140,6 +140,7 @@ class AuthService {
       avatarUrl:   user.avatar_url,
       role:        user.role,
       isVerified:  Boolean(user.is_verified),
+      isGoogleAuth: !user.password_hash,
       createdAt:   user.created_at
     };
   }

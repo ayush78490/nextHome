@@ -13,6 +13,8 @@ import '../../../../features/property/domain/entities/property.dart';
 import '../../../../features/property/domain/entities/reservation.dart';
 import '../../../../features/property/presentation/providers/property_provider.dart';
 import '../../../../features/property/presentation/widgets/property_card.dart';
+import '../../../../features/property/presentation/pages/list_property_page.dart';
+import 'edit_profile_page.dart';
 
 class ProfilePage extends ConsumerStatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -127,11 +129,42 @@ class _ProfilePageState extends ConsumerState<ProfilePage> with SingleTickerProv
                   user.fullName,
                   style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  user.email ?? user.username ?? 'No contact info',
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
-                ),
+                const SizedBox(height: 6),
+                if (user.email != null && user.email!.isNotEmpty)
+                  Row(
+                    children: [
+                      const Icon(Icons.email, size: 14, color: Colors.white54),
+                      const SizedBox(width: 6),
+                      Text(
+                        user.email!,
+                        style: const TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                    ],
+                  )
+                else if (user.username != null && user.username!.isNotEmpty)
+                  Row(
+                    children: [
+                      const Icon(Icons.alternate_email, size: 14, color: Colors.white54),
+                      const SizedBox(width: 6),
+                      Text(
+                        user.username!,
+                        style: const TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                if (user.phone != null && user.phone!.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      const Icon(Icons.phone, size: 14, color: Colors.white54),
+                      const SizedBox(width: 6),
+                      Text(
+                        user.phone!,
+                        style: const TextStyle(color: Colors.white70, fontSize: 14),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -146,6 +179,14 @@ class _ProfilePageState extends ConsumerState<ProfilePage> with SingleTickerProv
                 ),
               ],
             ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.edit, color: Color(0xFFC78842)),
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (context) => EditProfilePage(user: user),
+              ));
+            },
           ),
         ],
       ),
@@ -276,13 +317,32 @@ class _MyListingCard extends ConsumerWidget {
           ),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: Text(
-              property.isAvailable ? 'Status: Available' : 'Status: Sold Out',
-              style: TextStyle(
-                color: property.isAvailable ? const Color(0xFF42898E) : Colors.redAccent,
-                fontWeight: FontWeight.bold,
-                fontSize: 12,
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  property.isAvailable ? 'Status: Available' : 'Status: Sold Out',
+                  style: TextStyle(
+                    color: property.isAvailable ? const Color(0xFF42898E) : Colors.redAccent,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                  ),
+                ),
+                TextButton.icon(
+                  onPressed: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => ListPropertyPage(existingProperty: property),
+                    ));
+                  },
+                  icon: const Icon(Icons.edit, size: 16, color: Color(0xFFC78842)),
+                  label: const Text('Edit Property', style: TextStyle(color: Color(0xFFC78842))),
+                  style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    minimumSize: const Size(0, 0),
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 8),

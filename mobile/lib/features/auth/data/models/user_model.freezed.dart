@@ -28,6 +28,7 @@ mixin _$UserModel {
   String? get avatarUrl => throw _privateConstructorUsedError;
   String get role => throw _privateConstructorUsedError;
   bool get isVerified => throw _privateConstructorUsedError;
+  bool get isGoogleAuth => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
 
   /// Serializes this UserModel to a JSON map.
@@ -54,6 +55,7 @@ abstract class $UserModelCopyWith<$Res> {
       String? avatarUrl,
       String role,
       bool isVerified,
+      bool isGoogleAuth,
       DateTime? createdAt});
 }
 
@@ -80,6 +82,7 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
     Object? avatarUrl = freezed,
     Object? role = null,
     Object? isVerified = null,
+    Object? isGoogleAuth = null,
     Object? createdAt = freezed,
   }) {
     return _then(_value.copyWith(
@@ -115,6 +118,10 @@ class _$UserModelCopyWithImpl<$Res, $Val extends UserModel>
           ? _value.isVerified
           : isVerified // ignore: cast_nullable_to_non_nullable
               as bool,
+      isGoogleAuth: null == isGoogleAuth
+          ? _value.isGoogleAuth
+          : isGoogleAuth // ignore: cast_nullable_to_non_nullable
+              as bool,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -140,6 +147,7 @@ abstract class _$$UserModelImplCopyWith<$Res>
       String? avatarUrl,
       String role,
       bool isVerified,
+      bool isGoogleAuth,
       DateTime? createdAt});
 }
 
@@ -164,6 +172,7 @@ class __$$UserModelImplCopyWithImpl<$Res>
     Object? avatarUrl = freezed,
     Object? role = null,
     Object? isVerified = null,
+    Object? isGoogleAuth = null,
     Object? createdAt = freezed,
   }) {
     return _then(_$UserModelImpl(
@@ -199,6 +208,10 @@ class __$$UserModelImplCopyWithImpl<$Res>
           ? _value.isVerified
           : isVerified // ignore: cast_nullable_to_non_nullable
               as bool,
+      isGoogleAuth: null == isGoogleAuth
+          ? _value.isGoogleAuth
+          : isGoogleAuth // ignore: cast_nullable_to_non_nullable
+              as bool,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -219,6 +232,7 @@ class _$UserModelImpl extends _UserModel {
       this.avatarUrl,
       required this.role,
       this.isVerified = false,
+      this.isGoogleAuth = false,
       this.createdAt})
       : super._();
 
@@ -243,11 +257,14 @@ class _$UserModelImpl extends _UserModel {
   @JsonKey()
   final bool isVerified;
   @override
+  @JsonKey()
+  final bool isGoogleAuth;
+  @override
   final DateTime? createdAt;
 
   @override
   String toString() {
-    return 'UserModel(id: $id, email: $email, username: $username, phone: $phone, fullName: $fullName, avatarUrl: $avatarUrl, role: $role, isVerified: $isVerified, createdAt: $createdAt)';
+    return 'UserModel(id: $id, email: $email, username: $username, phone: $phone, fullName: $fullName, avatarUrl: $avatarUrl, role: $role, isVerified: $isVerified, isGoogleAuth: $isGoogleAuth, createdAt: $createdAt)';
   }
 
   @override
@@ -267,6 +284,8 @@ class _$UserModelImpl extends _UserModel {
             (identical(other.role, role) || other.role == role) &&
             (identical(other.isVerified, isVerified) ||
                 other.isVerified == isVerified) &&
+            (identical(other.isGoogleAuth, isGoogleAuth) ||
+                other.isGoogleAuth == isGoogleAuth) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt));
   }
@@ -274,7 +293,7 @@ class _$UserModelImpl extends _UserModel {
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
   int get hashCode => Object.hash(runtimeType, id, email, username, phone,
-      fullName, avatarUrl, role, isVerified, createdAt);
+      fullName, avatarUrl, role, isVerified, isGoogleAuth, createdAt);
 
   /// Create a copy of UserModel
   /// with the given fields replaced by the non-null parameter values.
@@ -302,6 +321,7 @@ abstract class _UserModel extends UserModel {
       final String? avatarUrl,
       required final String role,
       final bool isVerified,
+      final bool isGoogleAuth,
       final DateTime? createdAt}) = _$UserModelImpl;
   const _UserModel._() : super._();
 
@@ -324,6 +344,8 @@ abstract class _UserModel extends UserModel {
   String get role;
   @override
   bool get isVerified;
+  @override
+  bool get isGoogleAuth;
   @override
   DateTime? get createdAt;
 

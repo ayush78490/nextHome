@@ -16,6 +16,7 @@ _$UserModelImpl _$$UserModelImplFromJson(Map<String, dynamic> json) =>
       avatarUrl: json['avatarUrl'] as String?,
       role: json['role'] as String,
       isVerified: json['isVerified'] as bool? ?? false,
+      isGoogleAuth: json['isGoogleAuth'] as bool? ?? false,
       createdAt: json['createdAt'] == null
           ? null
           : DateTime.parse(json['createdAt'] as String),
@@ -31,5 +32,6 @@ Map<String, dynamic> _$$UserModelImplToJson(_$UserModelImpl instance) =>
       'avatarUrl': instance.avatarUrl,
       'role': instance.role,
       'isVerified': instance.isVerified,
+      'isGoogleAuth': instance.isGoogleAuth,
       'createdAt': instance.createdAt?.toIso8601String(),
     };

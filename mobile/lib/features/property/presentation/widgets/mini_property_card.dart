@@ -19,6 +19,9 @@ class MiniPropertyCard extends StatelessWidget {
         'baths': property.baths,
         'sqft': property.sqft,
         'imageUrls': property.imageUrls,
+        'description': property.description,
+        'facilities': property.facilities,
+        'locality': property.locality,
       },
     );
   }

@@ -10,6 +10,7 @@ class UserEntity extends Equatable {
   final String? avatarUrl;
   final String role;          // 'tenant' | 'landlord' | 'admin'
   final bool isVerified;
+  final bool isGoogleAuth;
   final DateTime? createdAt;
 
   const UserEntity({
@@ -21,6 +22,7 @@ class UserEntity extends Equatable {
     this.avatarUrl,
     required this.role,
     this.isVerified = false,
+    this.isGoogleAuth = false,
     this.createdAt,
   });
 
@@ -29,5 +31,5 @@ class UserEntity extends Equatable {
   bool get isAdmin    => role == 'admin';
 
   @override
-  List<Object?> get props => [id, email, username, fullName, role, isVerified];
+  List<Object?> get props => [id, email, username, fullName, role, isVerified, isGoogleAuth];
 }

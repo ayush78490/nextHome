@@ -31,6 +31,15 @@ class PropertiesController {
     }
   }
 
+  async updateProperty(req, res, next) {
+    try {
+      const property = await propertiesService.updateProperty(req.params.id, req.user.id, req.body);
+      res.status(200).json({ success: true, data: property });
+    } catch (err) {
+      next(err);
+    }
+  }
+
   async approveProperty(req, res, next) {
     try {
       await propertiesService.approveProperty(req.params.id);

@@ -102,12 +102,25 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, UserEntity>> updateProfile({
     String? fullName,
     String? phone,
+    String? email,
     String? avatarUrl,
   }) async {
     try {
       final userModel = await _remote.updateProfile(
-        fullName: fullName, phone: phone, avatarUrl: avatarUrl,
+        fullName: fullName, phone: phone, email: email, avatarUrl: avatarUrl,
       );
+      await _local.cacheUser(userModel);
+      return Right(userModel.toEntity());
+    } on DioException catch (err) {
+      final e = err.error is ApiException ? err.error as ApiException : ApiException.fromDio(err);
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> uploadAvatar(String filePath) async {
+    try {
+      final userModel = await _remote.uploadAvatar(filePath);
       await _local.cacheUser(userModel);
       return Right(userModel.toEntity());
     } on DioException catch (err) {

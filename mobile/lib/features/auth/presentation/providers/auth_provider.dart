@@ -114,4 +114,41 @@ class AuthNotifier extends StateNotifier<AsyncValue<void>> {
       state = AsyncValue.error(e, stackTrace);
     }
   }
+
+  Future<void> updateProfile({String? fullName, String? phone, String? email, String? avatarUrl}) async {
+    state = const AsyncValue.loading();
+    try {
+      final result = await _repository.updateProfile(
+        fullName: fullName,
+        phone: phone,
+        email: email,
+        avatarUrl: avatarUrl,
+      );
+      result.fold(
+        (failure) => throw Exception(failure.message),
+        (_) => null,
+      );
+      _ref.invalidate(userProvider);
+      state = const AsyncValue.data(null);
+    } catch (e, stackTrace) {
+      state = AsyncValue.error(e, stackTrace);
+      rethrow;
+    }
+  }
+
+  Future<void> uploadAvatar(String filePath) async {
+    state = const AsyncValue.loading();
+    try {
+      final result = await _repository.uploadAvatar(filePath);
+      result.fold(
+        (failure) => throw Exception(failure.message),
+        (_) => null,
+      );
+      _ref.invalidate(userProvider);
+      state = const AsyncValue.data(null);
+    } catch (e, stackTrace) {
+      state = AsyncValue.error(e, stackTrace);
+      rethrow;
+    }
+  }
 }

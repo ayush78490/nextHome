@@ -8,9 +8,12 @@ import 'package:geocoding/geocoding.dart';
 import '../widgets/location_picker_map.dart';
 import '../providers/property_provider.dart';
 import '../../../../core/constants/app_constants.dart';
+import '../../domain/entities/property.dart';
 
 class ListPropertyPage extends ConsumerStatefulWidget {
-  const ListPropertyPage({super.key});
+  final Property? existingProperty;
+
+  const ListPropertyPage({super.key, this.existingProperty});
 
   @override
   ConsumerState<ListPropertyPage> createState() => _ListPropertyPageState();
@@ -31,8 +34,6 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
   // Dropdown values
   String? _selectedPropertyType;
   String? _selectedListingType;
-
-
 
   // Property Information
   final _titleController = TextEditingController();
@@ -59,8 +60,25 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
   int _parkingLots = 0;
   int _kitchen = 0;
 
+  // Facilities & Locality
+  final List<String> _availableFacilities = [
+    'WiFi',
+    'Pool',
+    'Gym',
+    'Parking',
+    'AC',
+    'Heater',
+    'Balcony',
+    'Garden',
+    'Security'
+  ];
+  List<String> _selectedFacilities = [];
+  final _localityDestController = TextEditingController();
+  final _localityDistController = TextEditingController();
+
   // Images
   List<String> _uploadedImages = [];
+  List<String> _existingNetworkImages = [];
 
   // Terms
   bool _acceptedTerms = false;
@@ -84,9 +102,11 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
     if (_cityController.text.trim().isEmpty) return false;
     if (_addressController.text.trim().isEmpty) return false;
     if (_zipCodeController.text.trim().isEmpty) return false;
+    if (_localityDestController.text.trim().isEmpty) return false;
+    if (_localityDistController.text.trim().isEmpty) return false;
 
     // Minimum 4 images
-    if (_uploadedImages.length < 4) return false;
+    if (_uploadedImages.length + _existingNetworkImages.length < 4) return false;
 
     // Terms
     if (!_acceptedTerms) return false;
@@ -101,6 +121,31 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
   @override
   void initState() {
     super.initState();
+    if (widget.existingProperty != null) {
+      final p = widget.existingProperty!;
+      _titleController.text = p.title;
+      _priceController.text = p.price;
+      _addressController.text = p.address;
+
+      _landSqft = int.tryParse(p.sqft) ?? 0;
+      _bedrooms = int.tryParse(p.beds) ?? 0;
+      _bathrooms = int.tryParse(p.baths) ?? 0;
+      _selectedPropertyType = _propertyTypes.contains(p.category) ? p.category : null;
+      _selectedFacilities = List.from(p.facilities);
+
+      if (p.locality.contains(' - ')) {
+        final parts = p.locality.split(' - ');
+        _localityDestController.text = parts[0];
+        if (parts.length > 1) {
+          _localityDistController.text = parts[1];
+        }
+      } else {
+        _localityDestController.text = p.locality;
+      }
+
+      _existingNetworkImages = List.from(p.imageUrls);
+    }
+
     final controllers = [
       _firstNameController,
       _lastNameController,
@@ -116,6 +161,8 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
       _zipCodeController,
       _cityController,
       _addressController,
+      _localityDestController,
+      _localityDistController,
     ];
     for (var c in controllers) {
       c.addListener(_onFieldChanged);
@@ -138,6 +185,8 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
     _countryController.dispose();
     _stateController.dispose();
     _zipCodeController.dispose();
+    _localityDestController.dispose();
+    _localityDistController.dispose();
     super.dispose();
   }
 
@@ -475,7 +524,8 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
         backgroundColor: const Color(0xFF0F1B2B),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
-        title: const Text('List Property', style: TextStyle(color: Colors.white)),
+        title: Text(widget.existingProperty != null ? 'Edit Property' : 'List Property',
+            style: const TextStyle(color: Colors.white)),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => context.pop(),
@@ -489,7 +539,7 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Client Details
-              _buildSectionTitle('Client Details', 'Amet minim mollit non deserunt ullamco'),
+              _buildSectionTitle('Client Details', 'information about the property owner'),
               Row(
                 children: [
                   Expanded(child: _buildTextField('First Name', _firstNameController)),
@@ -532,7 +582,7 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
               const SizedBox(height: 32),
 
               // Property Information
-              _buildSectionTitle('Property Information', 'Amet minim mollit non deserunt ullamco'),
+              _buildSectionTitle('Property Information', 'information about the property'),
               _buildTextField('Listing Title', _titleController),
               const SizedBox(height: 16),
               Row(
@@ -556,7 +606,8 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
                   ),
                 ],
               ),
-              _buildTextField('Price', _priceController, keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              _buildTextField('Price', _priceController,
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true)),
               const SizedBox(height: 16),
 
               Row(
@@ -621,6 +672,53 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
               const SizedBox(height: 16),
 
               _buildTextField('Description', _descriptionController, maxLines: 5),
+              const SizedBox(height: 24),
+
+              // Locality
+              _buildSectionTitle('Locality', 'Destination and distance'),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: _buildTextField('Destination (e.g. Airport)', _localityDestController),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    flex: 1,
+                    child: _buildTextField('Distance (e.g. 5km)', _localityDistController),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+
+              // Facilities
+              _buildSectionTitle('Facilities', 'Select available facilities'),
+              Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                children: _availableFacilities.map((facility) {
+                  final isSelected = _selectedFacilities.contains(facility);
+                  return FilterChip(
+                    label: Text(facility,
+                        style: TextStyle(color: isSelected ? Colors.white : Colors.white70)),
+                    selected: isSelected,
+                    onSelected: (bool selected) {
+                      setState(() {
+                        if (selected) {
+                          _selectedFacilities.add(facility);
+                        } else {
+                          _selectedFacilities.remove(facility);
+                        }
+                      });
+                    },
+                    selectedColor: const Color(0xFF42898E),
+                    backgroundColor: const Color.fromARGB(255, 0, 78, 102),
+                    checkmarkColor: Colors.white,
+                    side: BorderSide(
+                        color: isSelected ? const Color(0xFF42898E) : const Color(0xFF2D2D44)),
+                  );
+                }).toList(),
+              ),
               const SizedBox(height: 24),
 
               // Image Upload
@@ -691,16 +789,67 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
                     );
                   }).toList(),
                 ),
+              if (_existingNetworkImages.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                const Text('Existing Images',
+                    style:
+                        TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _existingNetworkImages.asMap().entries.map((entry) {
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Container(
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: Colors.grey[800],
+                            borderRadius: BorderRadius.circular(8),
+                            image: DecorationImage(
+                              image: NetworkImage(entry.value),
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          right: -5,
+                          top: -5,
+                          child: GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _existingNetworkImages.removeAt(entry.key);
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                color: Colors.red,
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.close, color: Colors.white, size: 12),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ],
               const SizedBox(height: 24),
 
-              _buildTextField('Address', _addressController, suffixIcon: IconButton(
-                icon: Icon(Icons.map, color: _showMap ? const Color(0xFF42898E) : Colors.white54),
-                onPressed: () {
-                  setState(() {
-                    _showMap = !_showMap;
-                  });
-                },
-              )),
+              _buildTextField('Address', _addressController,
+                  suffixIcon: IconButton(
+                    icon:
+                        Icon(Icons.map, color: _showMap ? const Color(0xFF42898E) : Colors.white54),
+                    onPressed: () {
+                      setState(() {
+                        _showMap = !_showMap;
+                      });
+                    },
+                  )),
               if (_showMap) ...[
                 const SizedBox(height: 16),
                 LocationPickerMap(
@@ -812,15 +961,27 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
                               'bathrooms': _bathrooms,
                               'parkingLots': _parkingLots,
                               'kitchen': _kitchen,
+                              'facilities': _selectedFacilities,
+                              'locality':
+                                  '${_localityDestController.text.trim()} - ${_localityDistController.text.trim()}',
                             };
 
-                            await ref
-                                .read(propertyProvider.notifier)
-                                .createProperty(data, _uploadedImages);
+                            if (widget.existingProperty != null) {
+                              data['existingImages'] = _existingNetworkImages;
+                              await ref.read(propertyProvider.notifier).updateProperty(
+                                  widget.existingProperty!.id, data, _uploadedImages);
+                            } else {
+                              await ref
+                                  .read(propertyProvider.notifier)
+                                  .createProperty(data, _uploadedImages);
+                            }
 
                             if (mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Property Posted Successfully!')),
+                                SnackBar(
+                                    content: Text(widget.existingProperty != null
+                                        ? 'Property Updated Successfully!'
+                                        : 'Property Posted Successfully!')),
                               );
                               context.pop();
                             }
@@ -849,7 +1010,7 @@ class _ListPropertyPageState extends ConsumerState<ListPropertyPage> {
                           height: 20,
                           width: 20,
                           child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : const Text('Post Property'),
+                      : Text(widget.existingProperty != null ? 'Update Property' : 'Post Property'),
                 ),
               ),
             ],

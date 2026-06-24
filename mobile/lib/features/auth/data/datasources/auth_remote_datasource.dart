@@ -7,7 +7,8 @@ abstract class AuthRemoteDataSource {
   Future<(UserModel, String)> register({String? email, String? username, required String password, String? fullName});
   Future<(UserModel, String)> login({String? email, String? username, required String password});
   Future<UserModel> getProfile();
-  Future<UserModel> updateProfile({String? fullName, String? phone, String? avatarUrl});
+  Future<UserModel> updateProfile({String? fullName, String? phone, String? email, String? avatarUrl});
+  Future<UserModel> uploadAvatar(String filePath);
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -59,12 +60,22 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserModel> updateProfile({String? fullName, String? phone, String? avatarUrl}) async {
+  Future<UserModel> updateProfile({String? fullName, String? phone, String? email, String? avatarUrl}) async {
     final response = await _dio.patch('/auth/me', data: {
       if (fullName   != null) 'fullName':  fullName,
       if (phone      != null) 'phone':     phone,
+      if (email      != null) 'email':     email,
       if (avatarUrl  != null) 'avatarUrl': avatarUrl,
     });
+    return UserModel.fromJson(response.data['data'] as Map<String, dynamic>);
+  }
+
+  @override
+  Future<UserModel> uploadAvatar(String filePath) async {
+    final formData = FormData.fromMap({
+      'avatar': await MultipartFile.fromFile(filePath),
+    });
+    final response = await _dio.post('/auth/me/avatar', data: formData);
     return UserModel.fromJson(response.data['data'] as Map<String, dynamic>);
   }
 }

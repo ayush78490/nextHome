@@ -14,7 +14,7 @@ router.get('/:id', propertiesController.getProperty.bind(propertiesController));
 // POST /api/v1/properties
 router.post('/', authenticateJWT, propertiesController.createProperty.bind(propertiesController));
 // PATCH /api/v1/properties/:id
-router.patch('/:id', authenticateJWT, requireRole('landlord','admin'), (req, res) => res.json({ success: true, data: null }));
+router.patch('/:id', authenticateJWT, requireRole('landlord','admin'), propertiesController.updateProperty.bind(propertiesController));
 // DELETE /api/v1/properties/:id
 router.delete('/:id', authenticateJWT, requireRole('landlord','admin'), (req, res) => res.json({ success: true }));
 

@@ -16,6 +16,7 @@ class UserModel with _$UserModel {
     String? avatarUrl,
     required String role,
     @Default(false) bool isVerified,
+    @Default(false) bool isGoogleAuth,
     DateTime? createdAt,
   }) = _UserModel;
 
@@ -31,6 +32,7 @@ class UserModel with _$UserModel {
     avatarUrl:  avatarUrl,
     role:       role,
     isVerified: isVerified,
+    isGoogleAuth: isGoogleAuth,
     createdAt:  createdAt,
   );
 
@@ -43,6 +45,7 @@ class UserModel with _$UserModel {
     avatarUrl:  entity.avatarUrl,
     role:       entity.role,
     isVerified: entity.isVerified,
+    isGoogleAuth: entity.isGoogleAuth,
     createdAt:  entity.createdAt,
   );
 }

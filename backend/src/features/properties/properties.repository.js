@@ -38,6 +38,17 @@ class PropertiesRepository {
     return data;
   }
 
+  async update(id, updateData) {
+    const { data, error } = await supabase
+      .from('properties')
+      .update(updateData)
+      .eq('id', id)
+      .select()
+      .single();
+    if (error) throw error;
+    return data;
+  }
+
   async updateImages(id, imageUrls) {
     const { data, error } = await supabase
       .from('properties')

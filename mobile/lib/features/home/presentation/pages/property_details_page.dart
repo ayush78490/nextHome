@@ -12,7 +12,8 @@ class PropertyDetailsPage extends StatefulWidget {
   State<PropertyDetailsPage> createState() => _PropertyDetailsPageState();
 }
 
-class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTickerProviderStateMixin {
+class _PropertyDetailsPageState extends State<PropertyDetailsPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedImageIndex = 0;
 
@@ -70,7 +71,8 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
                         return CachedNetworkImage(
                           imageUrl: imageUrls[index],
                           fit: BoxFit.cover,
-                          placeholder: (context, url) => const Center(child: CircularProgressIndicator(color: Colors.white)),
+                          placeholder: (context, url) =>
+                              const Center(child: CircularProgressIndicator(color: Colors.white)),
                           errorWidget: (context, url, error) => Container(
                             color: Colors.grey[800],
                             child: const Icon(Icons.broken_image, color: Colors.white54),
@@ -96,7 +98,15 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
     final beds = widget.propertyData['beds']?.toString() ?? '';
     final baths = widget.propertyData['baths']?.toString() ?? '';
     final sqft = widget.propertyData['sqft']?.toString() ?? '';
-    final imageUrls = (widget.propertyData['imageUrls'] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [];
+    final imageUrls =
+        (widget.propertyData['imageUrls'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+            [];
+    final description =
+        widget.propertyData['description']?.toString() ?? 'No description provided.';
+    final facilities =
+        (widget.propertyData['facilities'] as List<dynamic>?)?.map((e) => e.toString()).toList() ??
+            [];
+    final locality = widget.propertyData['locality']?.toString() ?? 'Unknown locality.';
 
     return Scaffold(
       backgroundColor: const Color(0xFF0F1B2B), // Dark theme
@@ -123,13 +133,14 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
                                 fit: BoxFit.cover,
                                 errorWidget: (context, url, error) => Container(
                                   color: Colors.grey[800],
-                                  child: const Icon(Icons.image_not_supported, color: Colors.white54, size: 50),
+                                  child: const Icon(Icons.image_not_supported,
+                                      color: Colors.white54, size: 50),
                                 ),
                               )
                             : Container(color: Colors.grey),
                       ),
                     ),
-                    
+
                     // Top App Bar Icons
                     SafeArea(
                       child: Padding(
@@ -202,12 +213,15 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
                                             ? Container(
                                                 decoration: BoxDecoration(
                                                   color: Colors.black.withOpacity(0.5),
-                                                  borderRadius: BorderRadius.circular(10), // inner radius slightly smaller
+                                                  borderRadius: BorderRadius.circular(
+                                                      10), // inner radius slightly smaller
                                                 ),
                                                 alignment: Alignment.center,
                                                 child: Text(
                                                   '+${imageUrls.length - 4}',
-                                                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                                                  style: const TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight: FontWeight.bold),
                                                 ),
                                               )
                                             : null,
@@ -244,11 +258,12 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
                         ),
                         child: const Text(
                           '20% Off',
-                          style: TextStyle(color: Color(0xFFC78842), fontWeight: FontWeight.bold, fontSize: 12),
+                          style: TextStyle(
+                              color: Color(0xFFC78842), fontWeight: FontWeight.bold, fontSize: 12),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // Title & Location Button
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,7 +274,10 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
                               children: [
                                 Text(
                                   title,
-                                  style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
@@ -311,48 +329,45 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
                         // Description
                         const Text(
                           'Description',
-                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
-                          'Experience luxury living in this beautifully designed modern home. Featuring state-of-the-art amenities, breathtaking views, and an open concept floor plan perfect for entertaining. Close to premium shopping and dining.',
-                          style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.5),
+                        Text(
+                          description,
+                          style: const TextStyle(color: Colors.white70, fontSize: 14, height: 1.5),
                         ),
                         const SizedBox(height: 24),
 
                         // Facilities
-                        const Text(
-                          'Facilities',
-                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 12),
-                        Wrap(
-                          spacing: 12,
-                          runSpacing: 12,
-                          children: [
-                            _buildFacilityChip(Icons.ac_unit, 'AC'),
-                            _buildFacilityChip(Icons.water_drop, 'Geyser'),
-                            _buildFacilityChip(Icons.local_laundry_service, 'Washing Machine'),
-                            _buildFacilityChip(Icons.wifi, 'Wi-Fi'),
-                            _buildFacilityChip(Icons.tv, 'Smart TV'),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
+                        if (facilities.isNotEmpty) ...[
+                          const Text(
+                            'Facilities',
+                            style: TextStyle(
+                                color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 12),
+                          Wrap(
+                            spacing: 12,
+                            runSpacing: 12,
+                            children: facilities
+                                .map((f) => _buildFacilityChip(Icons.check_circle_outline, f))
+                                .toList(),
+                          ),
+                          const SizedBox(height: 24),
+                        ],
 
                         // Locality
-                        const Text(
-                          'Locality',
-                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 12),
-                        Column(
-                          children: [
-                            _buildLocalityItem(Icons.flight_takeoff, 'Airport', '5.2 km away'),
-                            _buildLocalityItem(Icons.train, 'Railway Station', '2.1 km away'),
-                            _buildLocalityItem(Icons.shopping_bag, 'Supermarket', '0.5 km away'),
-                          ],
-                        ),
-                        const SizedBox(height: 100), // Bottom padding for fixed action bar
+                        if (locality.isNotEmpty) ...[
+                          const Text(
+                            'Locality',
+                            style: TextStyle(
+                                color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 12),
+                          _buildLocalityItem(Icons.place, locality, ''),
+                          const SizedBox(height: 100), // Bottom padding for fixed action bar
+                        ],
                       ] else ...[
                         // Gallery Tab
                         SizedBox(
@@ -402,7 +417,10 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
               decoration: BoxDecoration(
                 color: const Color(0xFF1A2B42), // Darker bottom bar
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, -5)),
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 15,
+                      offset: const Offset(0, -5)),
                 ],
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(30)),
               ),
@@ -414,13 +432,16 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Text('Total Price', style: TextStyle(color: Colors.white54, fontSize: 12)),
+                        const Text('Total Price',
+                            style: TextStyle(color: Colors.white54, fontSize: 12)),
                         const SizedBox(height: 4),
-                        Text(price, style: const TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                        Text(price,
+                            style: const TextStyle(
+                                color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
                       ],
                     ),
                     const Spacer(),
-                    
+
                     // Chat Button
                     Container(
                       margin: const EdgeInsets.only(right: 12),
@@ -435,18 +456,42 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
                       ),
                     ),
 
-                    // Book Now Button
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF42898E),
-                        foregroundColor: Colors.white,
-                        minimumSize: const Size(150, 52), // Override global infinite width
-                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
-                        elevation: 0,
+                    // Action Buttons
+                    Expanded(
+                      flex: 2,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.white.withOpacity(0.1),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                                elevation: 0,
+                              ),
+                              onPressed: () {},
+                              child: const Text('Visit',
+                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF42898E),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+                                elevation: 0,
+                              ),
+                              onPressed: () {},
+                              child: const Text('Book',
+                                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                            ),
+                          ),
+                        ],
                       ),
-                      onPressed: () {},
-                      child: const Text('Book Now', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -480,7 +525,8 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
       children: [
         Icon(icon, color: const Color(0xFF42898E), size: 20),
         const SizedBox(width: 8),
-        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+        Text(value,
+            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
       ],
     );
   }
@@ -522,7 +568,9 @@ class _PropertyDetailsPageState extends State<PropertyDetailsPage> with SingleTi
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
+                Text(title,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
                 const SizedBox(height: 4),
                 Text(distance, style: const TextStyle(color: Colors.white54, fontSize: 12)),
               ],

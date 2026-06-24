@@ -79,11 +79,12 @@ class AuthRepository {
   /**
    * Update user profile
    */
-  async updateProfile(userId, { fullName, phone, avatarUrl }) {
+  async updateProfile(userId, { fullName, phone, avatarUrl, email }) {
     const updates = {};
     if (fullName !== undefined) updates.full_name = fullName;
     if (phone !== undefined) updates.phone = phone;
     if (avatarUrl !== undefined) updates.avatar_url = avatarUrl;
+    if (email !== undefined) updates.email = email;
     
     const { data, error } = await supabase
       .from('users')

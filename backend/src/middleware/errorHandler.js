@@ -25,7 +25,7 @@ function errorHandler(err, req, res, next) { // eslint-disable-line no-unused-va
   if (err.isOperational) {
     logger.warn(`[${err.code}] ${err.message}`, { path: req.path, method: req.method });
   } else {
-    logger.error('Unexpected error:', { error: err.message, stack: err.stack, path: req.path });
+    logger.error('Unexpected error:', { err, path: req.path });
   }
 
   // Oracle DB errors

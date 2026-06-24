@@ -10,6 +10,9 @@ class Property {
   final String sqft;
   final String category;
   final List<String> imageUrls;
+  final List<String> facilities;
+  final String locality;
+  final String description;
   
   // State
   final bool isInterested;
@@ -33,6 +36,9 @@ class Property {
     required this.sqft,
     required this.category,
     required this.imageUrls,
+    this.facilities = const [],
+    this.locality = '',
+    this.description = '',
     this.isInterested = false,
     this.isAvailable = true,
     this.isMyListing = false,
@@ -53,6 +59,9 @@ class Property {
     String? sqft,
     String? category,
     List<String>? imageUrls,
+    List<String>? facilities,
+    String? locality,
+    String? description,
     bool? isInterested,
     bool? isAvailable,
     bool? isMyListing,
@@ -72,6 +81,9 @@ class Property {
       sqft: sqft ?? this.sqft,
       category: category ?? this.category,
       imageUrls: imageUrls ?? this.imageUrls,
+      facilities: facilities ?? this.facilities,
+      locality: locality ?? this.locality,
+      description: description ?? this.description,
       isInterested: isInterested ?? this.isInterested,
       isAvailable: isAvailable ?? this.isAvailable,
       isMyListing: isMyListing ?? this.isMyListing,

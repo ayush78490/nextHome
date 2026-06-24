@@ -12,7 +12,7 @@ import '../../../property/presentation/providers/property_provider.dart';
 
 final totalUsersProvider = FutureProvider<int>((ref) async {
   try {
-    final response = await ref.read(dioProvider).get('/api/v1/admin/users/count');
+    final response = await ref.read(dioProvider).get('/admin/users/count');
     return (response.data['count'] as num?)?.toInt() ?? 0;
   } catch (e) {
     return 0;
@@ -157,14 +157,24 @@ class _AdminPageState extends ConsumerState<AdminPage> with SingleTickerProvider
   Widget _buildPropertiesTab(BuildContext context, WidgetRef ref) {
     final allProperties = ref.watch(propertyProvider);
     final pendingProperties = allProperties.where((p) => !p.isApproved).toList();
+    
+    // ignore: avoid_print
+    print('DEBUG ADMIN PAGE: allProperties.length = ${allProperties.length}, pendingProperties.length = ${pendingProperties.length}');
 
-    if (pendingProperties.isEmpty) {
-      return const Center(
-        child: Text('No pending properties.', style: TextStyle(color: Colors.white54)),
-      );
-    }
-
-    return ListView.separated(
+    return RefreshIndicator(
+      onRefresh: () async {
+        ref.invalidate(propertyProvider);
+      },
+      child: pendingProperties.isEmpty
+          ? ListView(
+              children: const [
+                SizedBox(height: 100),
+                Center(
+                  child: Text('No pending properties.', style: TextStyle(color: Colors.white54)),
+                ),
+              ],
+            )
+          : ListView.separated(
       padding: const EdgeInsets.all(20),
       itemCount: pendingProperties.length,
       separatorBuilder: (_, __) => const SizedBox(height: 16),
@@ -250,8 +260,9 @@ class _AdminPageState extends ConsumerState<AdminPage> with SingleTickerProvider
           ),
         );
       },
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildStatisticsTab(BuildContext context, WidgetRef ref) {
     final allProperties = ref.watch(propertyProvider);

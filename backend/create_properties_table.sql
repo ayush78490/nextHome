@@ -26,6 +26,8 @@ CREATE TABLE properties (
     parking_lots INT DEFAULT 0,
     kitchen INT DEFAULT 0,
     images TEXT[] DEFAULT '{}',
+    facilities TEXT[] DEFAULT '{}',
+    locality VARCHAR(255),
     is_approved BOOLEAN DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
